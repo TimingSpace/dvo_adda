@@ -1,0 +1,42 @@
+# pytorch_cuda
+FROM ubuntu:18.04
+#FROM nvidia/cuda:9.2-cudnn7-devel
+MAINTAINER xiangwei <wangxiangwei.cpp@gmail.com>
+
+RUN apt-get update && apt-get install -y --no-install-recommends apt-utils
+RUN apt-get install -y build-essential
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    vim \
+    zsh \
+    git \
+    cmake \
+    libgtk2.0-dev \
+    python3-tk \
+    wget \
+    htop \
+    tmux \
+    libopencv-dev \
+    libeigen3-dev \
+    libsuitesparse-dev
+
+
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m pip install torch\
+    torchvision \
+    visdom \
+    dominate \
+    scikit-learn \
+    pandas \
+    scipy \
+    ipython \
+    tqdm \
+    catkin-tools \
+    Pillow \
+    gym \
+    opencv-python \
+    matplotlib \
+    pyrr \
+    scikit-image
+
