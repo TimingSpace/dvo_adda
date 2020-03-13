@@ -7,7 +7,7 @@ from utils.inverse_warp import inverse_warp
 
 
 class RandomDataset(Dataset):
-    def __init__(self,data_length, transform_=None,camera_parameter=[64,48,32,32,32,24]):
+    def __init__(self,data_length=1000, transform_=None,camera_parameter=[64,48,32,32,32,24]):
         self.data_length = data_length
         self.camera_parameter = camera_parameter
         self.camera_intrinsic =torch.Tensor([self.camera_parameter[2],0,self.camera_parameter[4],0,self.camera_parameter[3],self.camera_parameter[5],0,0,1]).view(3,3)
@@ -21,7 +21,6 @@ class RandomDataset(Dataset):
         depth_0 = torch.Tensor(np.random.random((self.camera_parameter[1],self.camera_parameter[0])))#depth
         motion_se = torch.Tensor(np.random.random((6)))#motion
         image_1= self.warp(image_0,depth_0,motion_se)
-        print(image_1)
         image_f_01 = torch.Tensor( np.concatenate((image_0,image_1),axis=0))
         sample = {'image_f_01':image_f_01,'motion_f_01':motion_se}
         return sample
