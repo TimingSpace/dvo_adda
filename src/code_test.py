@@ -30,7 +30,7 @@ def test_model(image):
 def main():
     image = np.ones((1,6,480,640))
     image = torch.Tensor(image)
-    test_model(image)
+    #test_model(image)
     test_data()
 
 
