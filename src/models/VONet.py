@@ -47,7 +47,6 @@ class DVOFeature(nn.Module):
 
     def forward(self, image_pairs):
         conv_out = self.vonet(image_pairs)
-        print(conv_out.shape)
         return self.fc1(conv_out.view(-1,256*3*4))
 # visual odometry regression
 class DVORegression(nn.Module):

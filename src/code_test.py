@@ -9,7 +9,7 @@ from models.VONet import DVOFeature,DVORegression
 from models.discriminator import Discriminator
 from train import train
 def test_train():
-    dataset = RandomDataset(10000)
+    dataset = RandomDataset(100)
     dataloader = DataLoader(dataset, batch_size=1,shuffle=False ,num_workers=1,drop_last=True)
     dvo_feature_extractor = DVOFeature()
     dvo_regressor         = DVORegression()
@@ -17,12 +17,19 @@ def test_train():
     train(dvo_feature_extractor,dvo_regressor,dataloader)
 
 def test_data():
-    dataset = RandomDataset(10)
+    dataset = RandomDataset(10,motion_ax=[0,0,1,0,0,0])
     dataloader = DataLoader(dataset, batch_size=4,shuffle=False ,num_workers=1,drop_last=True)
     for i_batch, sample_batched in enumerate(dataloader):
-        print(i_batch, sample_batched['image_f_01'])
+        #print(i_batch, sample_batched['image_f_01'])
         print(i_batch, sample_batched['motion_f_01'])
+    img_1,img_2,depth,motion = dataset.show_item()
+    print(motion)
+    cv2.imshow('img_1',img_1)
+    cv2.imshow('img_2',img_2)
+    cv2.imshow('depth',depth/10)
+    cv2.waitKey()
 
+    
 
 def test_model(image):
     dvo_feature_extractor = DVOFeature()

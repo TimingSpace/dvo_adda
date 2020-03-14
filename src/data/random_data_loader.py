@@ -7,11 +7,12 @@ from utils.inverse_warp import inverse_warp
 
 
 class RandomDataset(Dataset):
-    def __init__(self,data_length=1000, transform_=None,camera_parameter=[64,48,32,32,32,24]):
+    def __init__(self,data_length=1000, transform_=None,camera_parameter=[64,48,32,32,32,24],motion_ax=[1,1,1,1,1,1]):
         self.data_length = data_length
         self.camera_parameter = camera_parameter
         self.camera_intrinsic =torch.Tensor([self.camera_parameter[2],0,self.camera_parameter[4],0,self.camera_parameter[3],self.camera_parameter[5],0,0,1]).view(3,3)
         self.inverse_camera_intrinsic = self.camera_intrinsic.inverse()
+        self.motion_ax = np.array(motion_ax)
 
     def __len__(self):
         return self.data_length
@@ -19,11 +20,22 @@ class RandomDataset(Dataset):
     def __getitem__(self, idx):
         image_0 = torch.Tensor(np.random.random((3,self.camera_parameter[1],self.camera_parameter[0])))#image_0
         depth_0 = torch.Tensor(np.random.random((self.camera_parameter[1],self.camera_parameter[0])))#depth
-        motion_se = torch.Tensor(np.random.random((6)))#motion
+        motion_se = torch.Tensor((2*np.random.random((6))-1)*self.motion_ax)#motion
         image_1= self.warp(image_0,depth_0,motion_se)
         image_f_01 = torch.Tensor( np.concatenate((image_0,image_1),axis=0))
         sample = {'image_f_01':image_f_01,'motion_f_01':motion_se}
         return sample
+    def show_item(self):
+        image_0 = np.random.random((3,self.camera_parameter[1],self.camera_parameter[0]))#image_0
+        depth_0 = 20*np.random.random((self.camera_parameter[1],self.camera_parameter[0]))#depth
+        motion_se = (2*np.random.random((6))-1)*self.motion_ax#motion
+        image_1= self.warp_np(image_0,depth_0,motion_se)
+        return image_0.transpose(1,2,0),image_1.transpose(1,2,0),depth_0,motion_se
+
+    def warp_np(self,image,depth,motion_se):
+        image_1= inverse_warp(torch.Tensor(image).unsqueeze(0),torch.Tensor(depth).unsqueeze(0),\
+                torch.Tensor(motion_se).unsqueeze(0),self.camera_intrinsic.unsqueeze(0))[0].squeeze()
+        return np.array(image_1)
 
     def warp(self,image,depth,motion_se):
         return inverse_warp(image.unsqueeze(0),depth.unsqueeze(0),\

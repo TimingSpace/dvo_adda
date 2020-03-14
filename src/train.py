@@ -13,17 +13,19 @@ def train(feature_extractor,regressor,dataloader,args=None):
                 lr=0.001)
     loss_func = nn.MSELoss()
 
-    for epoch in range(100):
+    for epoch in range(10000):
+        loss_sum = 0
         for step, samples in enumerate(dataloader):
             optimizer.zero_grad()
             images = samples['image_f_01']
             motions = samples['motion_f_01']
             feature = feature_extractor(images)
-            print(feature.shape)
             motions_pred  = regressor(feature)
             loss = loss_func(motions_pred, motions)
-            print('loss',loss)
+            loss_sum += loss.item() 
             # optimize source classifier
             loss.backward()
             optimizer.step()
+        loss_sum = loss_sum/(len(dataloader)//dataloader.batch_size)
+        print('epoch  ',epoch,' loss ' ,loss_sum)
 
