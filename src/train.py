@@ -12,7 +12,7 @@ def train(feature_extractor,regressor,dataloader,args=None):
         list(feature_extractor.parameters()) + list(regressor.parameters()),
                 lr=0.001)
     loss_func = nn.MSELoss()
-
+    train_log = open('train_log_'+args.motion_ax.replace(' ','')+'.txt','w')
     for epoch in range(10000):
         loss_sum = 0
         for step, samples in enumerate(dataloader):
@@ -28,4 +28,9 @@ def train(feature_extractor,regressor,dataloader,args=None):
             optimizer.step()
         loss_sum = loss_sum/(len(dataloader)//dataloader.batch_size)
         print('epoch  ',epoch,' loss ' ,loss_sum)
+        train_log.write(str(epoch)+' '+str(loss_sum)+'\n')
+        if epoch%10==1:
+            train_log.flush()
+
+
 
