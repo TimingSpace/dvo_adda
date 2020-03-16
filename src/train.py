@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-import cv2
+#import cv2
 import torch.optim as optim
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
