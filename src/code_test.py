@@ -13,8 +13,9 @@ def test_train():
     args = parse()
     print(args)
     motion_ax_i = [int(i) for i in args.motion_ax.split(' ')]
-    dataset = RandomDataset(100,motion_ax = motion_ax_i)
-    dataloader = DataLoader(dataset, batch_size=1,shuffle=False ,num_workers=1,drop_last=True,worker_init_fn=lambda wid:np.random.seed(np.uint32(torch.initial_seed() + wid)))
+    dataset = RandomDataset(20000,motion_ax = motion_ax_i)
+    dataloader = DataLoader(dataset, batch_size=1000,shuffle=False ,num_workers=1,drop_last=True,worker_init_fn=lambda wid:np.random.seed(np.uint32(torch.initial_seed() + wid)))
+    print(len(dataloader))
     dvo_feature_extractor = DVOFeature()
     dvo_regressor         = DVORegression()
     dvo_discriminator     = Discriminator(500,500,2)

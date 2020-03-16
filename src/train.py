@@ -8,6 +8,9 @@ from torch.utils.data import Dataset, DataLoader
 
 
 def train(feature_extractor,regressor,dataloader,args=None):
+    if args.gpu:
+        feature_extractor = feature_extractor.cuda()
+        regressor         = regressor.cuda()
     optimizer = optim.Adam(
         list(feature_extractor.parameters()) + list(regressor.parameters()),
                 lr=0.001)
@@ -19,6 +22,9 @@ def train(feature_extractor,regressor,dataloader,args=None):
             optimizer.zero_grad()
             images = samples['image_f_01']
             motions = samples['motion_f_01']
+            if args.gpu:
+                images = images.cuda()
+                motions = motions.cuda()
             feature = feature_extractor(images)
             motions_pred  = regressor(feature)
             loss = loss_func(motions_pred, motions)
@@ -26,7 +32,7 @@ def train(feature_extractor,regressor,dataloader,args=None):
             # optimize source classifier
             loss.backward()
             optimizer.step()
-        loss_sum = loss_sum/(len(dataloader)//dataloader.batch_size)
+        loss_sum = loss_sum/(len(dataloader))
         print('epoch  ',epoch,' loss ' ,loss_sum)
         train_log.write(str(epoch)+' '+str(loss_sum)+'\n')
         if epoch%10==1:

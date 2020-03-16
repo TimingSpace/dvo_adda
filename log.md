@@ -16,5 +16,6 @@
 2. add test
 3. found the loss keep same for each epoch when testing, random is not random 
 4. solve random problem: `worker_init_fn=lambda wid: np.random.seed(np.uint32(torch.initial_seed() + wid))`
-
+5. add gpu train
+6. len(dataloader) = len(dataset)/batch_size
 # 20200316

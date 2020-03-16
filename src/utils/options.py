@@ -12,6 +12,7 @@ def parse():
     parser.add_argument('--motion_ax', dest='motion_ax', default='0 0 1 0 0 0', help='motion_ax')
     parser.add_argument('--test_motion_ax', dest='test_motion_ax', default='0 0 0 0 1 0', help='test_motion_ax')
     parser.add_argument('--epoch', dest='epoch', type=int,default=1000, help='epoch')
+    parser.add_argument('--gpu', dest='gpu',default=True, help='gpu')
 
     '''
     parser.add_argument('--optimizer', dest='optimization_method', default='sgd', help='optimization method')
