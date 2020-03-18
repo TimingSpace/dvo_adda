@@ -18,4 +18,11 @@
 4. solve random problem: `worker_init_fn=lambda wid: np.random.seed(np.uint32(torch.initial_seed() + wid))`
 5. add gpu train
 6. len(dataloader) = len(dataset)/batch_size
-# 20200316
+# 20200317
+1. modify align_corners = False to deal with a version warning
+2. result on random training show that it is difficult to converge for full 6 dof motion
+
+# 20200318
+1.todo:  remap kitti to the same intrinsic parameter with random training data. to test the domain 
+adaption performance.
+2.. add remap.py based on inverse_warp.py
