@@ -10,7 +10,7 @@ data_2 = np.loadtxt(sys.argv[3])
 data_3 = np.loadtxt(sys.argv[4])
 
 fig,ax = plt.subplots()
-plt.plot(data[:100,1],label='001000')
+ax.plot(data[:100,1],label='001000')
 ax.plot(data_1[:100,1],label='001010')
 ax.plot(data_2[:100,1],label='111010')
 ax.plot(data_3[:100,1],label='111111')
