@@ -23,6 +23,19 @@
 2. result on random training show that it is difficult to converge for full 6 dof motion
 
 # 20200318
-1.todo:  remap kitti to the same intrinsic parameter with random training data. to test the domain 
+1. todo:  remap kitti to the same intrinsic parameter with random training data. to test the domain 
 adaption performance.
-2.. add remap.py based on inverse_warp.py
+2. add remap.py based on inverse_warp.py
+
+# 20200319
+1. todo :visualzie some inverse warped image to check and add to paper: 
+    * available rgb and depth; 
+    * available depth and random rgb
+    * available rgb and random depth
+    * random rgb and rangdom depth
+# 20200320 
+
+1. continue work of 0319
+2. grid_corners has version conflicted, same code can't run both in 1.4 and 1.1 (solved by check the version then used
+differient code )
+3. control motion by motion.txt

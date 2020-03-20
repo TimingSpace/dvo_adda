@@ -3,6 +3,7 @@ import cv2
 import torch
 import numpy as np
 from remap import remap
+from inverse_warp import inverse_warp
 
 def test_remap():
     image = cv2.imread(sys.argv[1])
@@ -17,8 +18,21 @@ def test_remap():
     cv2.waitKey()
 
 # 1241.0, 376.0, 718.8560, 718.8560, 607.1928, 185.2157
-    
+def show_item():
+    image_0 = np.random.random((3,camera_parameter[1],camera_parameter[0]))#image_0
+    depth_0 = 20*np.random.random((camera_parameter[1],camera_parameter[0]))#depth
+    motion_se = (2*np.random.random((6))-1)*motion_ax#motion
+    image_1= warp_np(image_0,depth_0,motion_se)
+    return image_0.transpose(1,2,0),depth_0,image_1.transpose(1,2,0),depth_0,motion_se
 
+def warp_np(image,depth,motion_se):
+    image_1= inverse_warp(torch.Tensor(image).unsqueeze(0),torch.Tensor(depth).unsqueeze(0),\
+            torch.Tensor(motion_se).unsqueeze(0),camera_intrinsic.unsqueeze(0))[0].squeeze()
+    return np.array(image_1)
+
+
+def test_inverse_warp():
+   
 def main():
     test_remap()
 
