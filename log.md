@@ -39,3 +39,10 @@ adaption performance.
 2. grid_corners has version conflicted, same code can't run both in 1.4 and 1.1 (solved by check the version then used
 differient code )
 3. control motion by motion.txt
+
+
+# 20200321
+
+# 20200322
+1. never use -1 when reshape
+2. add train on real image

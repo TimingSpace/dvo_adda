@@ -28,6 +28,7 @@ def train(feature_extractor,regressor,dataloader,args=None):
             feature = feature_extractor(images)
             motions_pred  = regressor(feature)
             loss = loss_func(motions_pred, motions)
+            print(loss.data)
             loss_sum += loss.item() 
             # optimize source classifier
             loss.backward()

@@ -21,6 +21,7 @@ def coor_channel(camera_parameter):
             image[0,i_row,i_col] = (i_row - camera_parameter[5])/camera_parameter[3]
             image[1,i_row,i_col] = (i_col - camera_parameter[4])/camera_parameter[2]
     return image
+
 class SepeDataset(Dataset):
     """
     Dataset: the dataset can contain multiple sequences, for each sequence a list file
@@ -50,7 +51,7 @@ class SepeDataset(Dataset):
             self.coor_channel = coor_channel(camera_parameter)
             self.coor_channel = torch.from_numpy(self.coor_channel).float()
         for i in range(0,self.seq_num):
-            poses = np.loadtxt(self.poses_files.ix[i,0])
+            poses = np.loadtxt(self.poses_files['data'].loc[i])
             if poses.shape[1] == 7:# quaternion to SE3
                 poses = tf.pos_quats2SEs(poses)
 
@@ -58,10 +59,19 @@ class SepeDataset(Dataset):
             ses     = tf.SEs2ses(motions[0:-1,:])
             all_ses = np.append(all_ses,ses)
             self.motions.append(motions)
-            self.image_paths.append(pd.read_csv(self.image_lists.ix[i,0]))
+            self.image_paths.append(pd.read_csv(self.image_lists['data'].loc[i]))
             self.seq_lengths[i+1] =self.seq_lengths[i]+motions.shape[0]-1
         all_ses = all_ses.reshape(int(self.seq_lengths[-1]),6)
-        self.transform = transforms.Compose(transform_)
+        self.transform = None
+
+        transforms_ = [
+                transforms.Resize((480,640)),
+                transforms.ToTensor(),
+                transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5)) ]
+
+
+        if transform_ is not None:
+            self.transform = transforms.Compose(transform_)
         self.motion_means = np.mean(all_ses,0)
         self.motion_stds  = np.std(all_ses,0)
         mean_std_name = path_to_poses_files.split('.')
@@ -86,14 +96,17 @@ class SepeDataset(Dataset):
                 seq_id = i
                 data_id = int(idx-self.seq_lengths[i])
                 #load image
-                img_name_0 = self.image_paths[seq_id].ix[data_id+0,0]
-                img_name_1 = self.image_paths[seq_id].ix[data_id+1,0]
-                img_name_2 = self.image_paths[seq_id].ix[data_id+2,0]
+                img_name_0 = self.image_paths[seq_id]['data'].loc[data_id+0]
+                img_name_1 = self.image_paths[seq_id]['data'].loc[data_id+1]
+                img_name_2 = self.image_paths[seq_id]['data'].loc[data_id+2]
 
                 image_0 = Image.open(img_name_0).convert('RGB')
                 image_1 = Image.open(img_name_1).convert('RGB')
                 image_2 = Image.open(img_name_2).convert('RGB')
-                if(self.transform):
+                image_0 = np.transpose(image_0,(2,0,1) )
+                image_1 = np.transpose(image_1,(2,0,1) )
+                image_2 = np.transpose(image_2,(2,0,1) )
+                if(self.transform is not None):
                     image_0 = self.transform(image_0)
                     image_1 = self.transform(image_1)
                     image_2 = self.transform(image_2)
@@ -111,7 +124,12 @@ class SepeDataset(Dataset):
                     image_b_10 = np.concatenate((image_b_10,self.coor_channel),axis=0)
                     image_b_21 = np.concatenate((image_b_21,self.coor_channel),axis=0)
                     image_b_20 = np.concatenate((image_b_20,self.coor_channel),axis=0)
-
+                image_f_01 = torch.FloatTensor(image_f_01)
+                image_f_12 = torch.FloatTensor(image_f_12)
+                image_f_02 = torch.FloatTensor(image_f_02)
+                image_b_10 = torch.FloatTensor(image_b_10)
+                image_b_21 = torch.FloatTensor(image_b_21)
+                image_b_20 = torch.FloatTensor(image_b_20)
                 #load motion
                 motion_f_01_mat   =  np.matrix(np.eye(4))
                 motion_f_12_mat   =  np.matrix(np.eye(4))

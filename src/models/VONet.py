@@ -35,7 +35,7 @@ class DVOFeature(nn.Module):
         #vo
         self.vonet=nn.Sequential(self.conv1,self.conv2,self.conv3,self.conv4,\
                 self.conv5)
-        self.fc1   = nn.Linear(256*3*4,500) # to detemine the width and height
+        self.fc1   = nn.Linear(256*30*40,500) # to detemine the width and height
 
     # weights initialization
     def init_weights(self):
@@ -47,7 +47,7 @@ class DVOFeature(nn.Module):
 
     def forward(self, image_pairs):
         conv_out = self.vonet(image_pairs)
-        return self.fc1(conv_out.view(-1,256*3*4))
+        return self.fc1(conv_out.view(conv_out.shape[0],256*30*40))# never use -1
 # visual odometry regression
 class DVORegression(nn.Module):
     def __init__(self):

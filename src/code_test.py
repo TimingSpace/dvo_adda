@@ -4,11 +4,30 @@ import torch
 #import cv2
 from torch.utils.data import Dataset, DataLoader
 
-from  data.random_data_loader import RandomDataset 
+from data.random_data_loader import RandomDataset 
+from data.data_loader import SepeDataset
 from models.VONet import DVOFeature,DVORegression
 from models.discriminator import Discriminator
+
 from utils.options import parse as parse
 from train import train,test
+import sys
+from skimage import io, transform
+
+def test_train_real():
+    args = parse()
+    print(args)
+    dataset = SepeDataset(args.poses_train,args.images_train,coor_layer_flag =False)
+    dataloader = DataLoader(dataset, batch_size=1,shuffle=True ,num_workers=1,drop_last=True,worker_init_fn=lambda wid:np.random.seed(np.uint32(torch.initial_seed() + wid)))
+    dvo_feature_extractor = DVOFeature()
+    dvo_regressor         = DVORegression()
+    dvo_discriminator     = Discriminator(500,500,2)
+    trained_feature,trained_regressor = train(dvo_feature_extractor,dvo_regressor,dataloader,args)
+    torch.save(trained_feature.state_dict(),'feature_seed'+args.motion_ax.replace(' ','')+str(args.epoch)+'.pt')
+    torch.save(trained_regressor.state_dict(),'regressor_seed'+args.motion_ax.replace(' ','')+str(args.epoch)+'.pt')
+
+
+
 def test_train():
     args = parse()
     print(args)
@@ -36,6 +55,22 @@ def test_test():
     dvo_regressor.load_state_dict(torch.load('regressor'+args.motion_ax.replace(' ','')+'.pt'))
     test(dvo_feature_extractor,dvo_regressor,dataloader,args)
 
+def test_sep_data():
+    motion_files_path = sys.argv[1]
+    path_files_path = sys.argv[2]
+    transforms_ = [
+                transforms.Resize((480,640)),
+                transforms.ToTensor(),
+                transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5)) ]
+
+
+    #kitti_dataset = KittiDataset(motions_file=motion_files_path,image_paths_file=path_files_path,transform=composed)
+    kitti_dataset = SepeDataset(path_to_poses_files=motion_files_path,path_to_image_lists=path_files_path,transform_=transforms_)
+    print(len(kitti_dataset))
+    dataloader = DataLoader(kitti_dataset, batch_size=4,shuffle=False ,num_workers=1,drop_last=True)
+    for i_batch, sample_batched in enumerate(dataloader):
+        print(i_batch, sample_batched['image_f_01'],sample_batched['image_b_20'].size())
+        print(i_batch, sample_batched['motion_f_01'],sample_batched['motion_b_20'])
 
 def test_data():
     dataset = RandomDataset(10,motion_ax=[0,0,1,0,1,0])
@@ -69,7 +104,8 @@ def main():
     #test_model(image)
     #test_data()
     #test_test()
-    test_train()
+    #test_sep_data()
+    test_train_real()
 
 
 if __name__ == '__main__':
