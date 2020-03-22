@@ -1,6 +1,8 @@
 import numpy as np
-import cv2
+#import cv2
 import pyrr
+from scipy.spatial.transform import Rotation as R
+
 def line2mat(line_data):
     mat = np.eye(4)
     mat[0:3,:] = line_data.reshape(3,4)
@@ -35,12 +37,10 @@ def SE2se(SE_data):
     result[3:6] = SO2so(SE_data[0:3,0:3]).T
     return result
 def SO2so(SO_data):
-    so = cv2.Rodrigues(SO_data)
-    return so[0]
+    return R.from_dcm(SO_data).as_rotvec()
 
 def so2SO(so_data):
-    result_mat = cv2.Rodrigues(np.array(so_data))
-    return result_mat[0]
+    return R.from_rotvec(so_data).as_dcm()
 
 def se2SE(se_data):
     result_mat = np.matrix(np.eye(4))

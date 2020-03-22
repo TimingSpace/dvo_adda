@@ -40,7 +40,7 @@ class DVOFeature(nn.Module):
     # weights initialization
     def init_weights(self):
         for m in self.modules():
-            if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTransvo2d):
+            if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d) or isinstance(m,nn.Linear):
                 nn.init.xavier_uniform(m.weight.data)
                 if m.bias is not None:
                     m.bias.data.zero_()
@@ -57,13 +57,13 @@ class DVORegression(nn.Module):
     # weights initialization
     def init_weights(self):
         for m in self.modules():
-            if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTransvo2d):
+            if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d) or isinstance(m,nn.Linear):
                 nn.init.xavier_uniform(m.weight.data)
                 if m.bias is not None:
                     m.bias.data.zero_()
 
     def forward(self, feature):
-        return self.fc2(feature)
+        return 0.01*self.fc2(feature)
 
 
 '''

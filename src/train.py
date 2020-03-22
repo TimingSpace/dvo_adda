@@ -11,6 +11,8 @@ def train(feature_extractor,regressor,dataloader,args=None):
     if args.gpu:
         feature_extractor = feature_extractor.cuda()
         regressor         = regressor.cuda()
+    #feature_extractor.init_weights()
+    #regressor.init_weights()
     optimizer = optim.Adam(
         list(feature_extractor.parameters()) + list(regressor.parameters()),
                 lr=0.001)
@@ -27,6 +29,7 @@ def train(feature_extractor,regressor,dataloader,args=None):
                 motions = motions.cuda()
             feature = feature_extractor(images)
             motions_pred  = regressor(feature)
+            print(motions_pred,motions)
             loss = loss_func(motions_pred, motions)
             print(loss.data)
             loss_sum += loss.item() 
