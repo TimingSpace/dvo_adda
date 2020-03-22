@@ -9,11 +9,12 @@ import argparse
 #configuration
 def parse():
     parser = argparse.ArgumentParser(description='')
+    parser.add_argument('--tag', dest='tag', default='ntsd_', help='tag')
     parser.add_argument('--motion_ax', dest='motion_ax', default='0 0 1 0 0 0', help='motion_ax')
     parser.add_argument('--test_motion_ax', dest='test_motion_ax', default='0 0 0 0 1 0', help='test_motion_ax')
     parser.add_argument('--images_train', dest='images_train', default='dataset/ntsd/ntsd.image.train', help='image_train')
     parser.add_argument('--poses_train', dest='poses_train', default='dataset/ntsd/ntsd.pose.train', help='pose_train')
-    parser.add_argument('--epoch', dest='epoch', type=int,default=1000, help='epoch')
+    parser.add_argument('--epoch', dest='epoch', type=int,default=100, help='epoch')
     parser.add_argument('--gpu', dest='gpu',type =int, default=1, help='gpu')
 
     '''

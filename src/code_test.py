@@ -19,13 +19,13 @@ def test_train_real():
     args = parse()
     print(args)
     dataset = SepeDataset(args.poses_train,args.images_train,coor_layer_flag =False)
-    dataloader = DataLoader(dataset, batch_size=1,shuffle=True ,num_workers=1,drop_last=True,worker_init_fn=lambda wid:np.random.seed(np.uint32(torch.initial_seed() + wid)))
+    dataloader = DataLoader(dataset, batch_size=3,shuffle=True ,num_workers=1,drop_last=True,worker_init_fn=lambda wid:np.random.seed(np.uint32(torch.initial_seed() + wid)))
     dvo_feature_extractor = DVOFeature()
     dvo_regressor         = DVORegression()
     dvo_discriminator     = Discriminator(500,500,2)
     trained_feature,trained_regressor = train(dvo_feature_extractor,dvo_regressor,dataloader,args)
-    torch.save(trained_feature.state_dict(),'feature_seed'+args.motion_ax.replace(' ','')+str(args.epoch)+'.pt')
-    torch.save(trained_regressor.state_dict(),'regressor_seed'+args.motion_ax.replace(' ','')+str(args.epoch)+'.pt')
+    torch.save(trained_feature.state_dict(),'feature_'+args.tag++str(args.epoch)+'.pt')
+    torch.save(trained_regressor.state_dict(),'regressor_seed_'+args.tag++str(args.epoch)+'.pt')
 
 
 def test_adapt():
@@ -117,8 +117,8 @@ def main():
     #test_data()
     #test_test()
     #test_sep_data()
-    #test_train_real()
-    test_adapt()
+    test_train_real()
+    #test_adapt()
 
 
 if __name__ == '__main__':
