@@ -1,6 +1,6 @@
 import numpy as np
 #import cv2
-import pyrr
+#import pyrr
 from scipy.spatial.transform import Rotation as R
 
 def line2mat(line_data):
@@ -122,12 +122,11 @@ def sos2quats(so_datas,mean_std=[[1],[1]]):
     return quat_datas
 
 def quat2SO(quat_data):
-    SO = pyrr.Matrix33(quat_data)
-    SO = np.array(SO)
-    return SO
+    return R.from_quat(quat_data).as_dcm()
+
 
 def pos_quat2SE(quat_data):
-    SO = pyrr.Matrix33(quat_data[3:7])
+    SO = R.from_quat(quat_data[3:7]).as_dcm()
     SE = np.matrix(np.eye(4))
     SE[0:3,0:3] = np.matrix(SO)
     SE[0:3,3]   = np.matrix(quat_data[0:3]).T
