@@ -24,8 +24,8 @@ def test_train_real():
     dvo_regressor         = DVORegression()
     dvo_discriminator     = Discriminator(500,500,2)
     trained_feature,trained_regressor = train(dvo_feature_extractor,dvo_regressor,dataloader,args)
-    torch.save(trained_feature.state_dict(),'feature_'+args.tag++str(args.epoch)+'.pt')
-    torch.save(trained_regressor.state_dict(),'regressor_seed_'+args.tag++str(args.epoch)+'.pt')
+    torch.save(trained_feature.state_dict(),'feature_'+args.tag+str(args.epoch)+'.pt')
+    torch.save(trained_regressor.state_dict(),'regressor_'+args.tag+str(args.epoch)+'.pt')
 
 
 def test_adapt():
