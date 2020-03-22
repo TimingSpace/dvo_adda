@@ -7,7 +7,6 @@ from skimage import io, transform
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
-import cv2
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils
 import data.transformation as tf

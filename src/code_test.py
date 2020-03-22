@@ -33,10 +33,14 @@ def test_adapt():
     print(args)
     dataset = SepeDataset(args.poses_train,args.images_train,coor_layer_flag =False)
     dataloader = DataLoader(dataset, batch_size=1,shuffle=True ,num_workers=1,drop_last=True,worker_init_fn=lambda wid:np.random.seed(np.uint32(torch.initial_seed() + wid)))
+    dataset_tgt = SepeDataset(args.poses_target,args.images_target,coor_layer_flag =False)
+    dataloader_tgt = DataLoader(dataset_tgt, batch_size=1,shuffle=True ,num_workers=1,drop_last=True,worker_init_fn=lambda wid:np.random.seed(np.uint32(torch.initial_seed() + wid)))
     src_extractor = DVOFeature()
     tgt_extractor = DVOFeature()
+    src_extractor.load_state_dict(torch.load(args.feature_model))
+    tgt_extractor.load_state_dict(torch.load(args.feature_model))
     dvo_discriminator     = Discriminator(500,500,2)
-    adapt(src_extractor,tgt_extractor,dvo_discriminator,dataloader,dataloader,args)
+    adapt(src_extractor,tgt_extractor,dvo_discriminator,dataloader,dataloader_tgt,args)
     
 
 
@@ -117,8 +121,8 @@ def main():
     #test_data()
     #test_test()
     #test_sep_data()
-    test_train_real()
-    #test_adapt()
+    #test_train_real()
+    test_adapt()
 
 
 if __name__ == '__main__':
