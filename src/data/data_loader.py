@@ -64,7 +64,7 @@ class SepeDataset(Dataset):
         all_ses = all_ses.reshape(int(self.seq_lengths[-1]),6)
         self.transform = None
 
-        transforms_ = [
+        transform_ = [
                 transforms.Resize((480,640)),
                 transforms.ToTensor(),
                 transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5)) ]
@@ -103,9 +103,6 @@ class SepeDataset(Dataset):
                 image_0 = Image.open(img_name_0).convert('RGB')
                 image_1 = Image.open(img_name_1).convert('RGB')
                 image_2 = Image.open(img_name_2).convert('RGB')
-                image_0 = np.transpose(image_0,(2,0,1) )
-                image_1 = np.transpose(image_1,(2,0,1) )
-                image_2 = np.transpose(image_2,(2,0,1) )
                 if(self.transform is not None):
                     image_0 = self.transform(image_0)
                     image_1 = self.transform(image_1)

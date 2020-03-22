@@ -12,7 +12,7 @@ The assumption of this world is that:
 
 ## Requirement
 * Python 
-* Pytorch
+    * Pytorch numpy scipy pandas scikit-image
 * GPU
 
 ## Network Structure

@@ -11,6 +11,7 @@ from models.discriminator import Discriminator
 
 from utils.options import parse as parse
 from train import train,test
+from adapt import adapt
 import sys
 from skimage import io, transform
 
@@ -26,6 +27,17 @@ def test_train_real():
     torch.save(trained_feature.state_dict(),'feature_seed'+args.motion_ax.replace(' ','')+str(args.epoch)+'.pt')
     torch.save(trained_regressor.state_dict(),'regressor_seed'+args.motion_ax.replace(' ','')+str(args.epoch)+'.pt')
 
+
+def test_adapt():
+    args = parse()
+    print(args)
+    dataset = SepeDataset(args.poses_train,args.images_train,coor_layer_flag =False)
+    dataloader = DataLoader(dataset, batch_size=1,shuffle=True ,num_workers=1,drop_last=True,worker_init_fn=lambda wid:np.random.seed(np.uint32(torch.initial_seed() + wid)))
+    src_extractor = DVOFeature()
+    tgt_extractor = DVOFeature()
+    dvo_discriminator     = Discriminator(500,500,2)
+    adapt(src_extractor,tgt_extractor,dvo_discriminator,dataloader,dataloader,args)
+    
 
 
 def test_train():
@@ -105,7 +117,8 @@ def main():
     #test_data()
     #test_test()
     #test_sep_data()
-    test_train_real()
+    #test_train_real()
+    test_adapt()
 
 
 if __name__ == '__main__':
