@@ -40,16 +40,13 @@ def test_test():
 def test_data():
     args = parse()
     print(args)
-    motion_ax_i = [int(i) for i in args.motion_ax.split(' ')]
+    motion_ax_i = [float(i) for i in args.motion_ax.split(' ')]
     dataset = RandomDataset(10,motion_path='dataset/random/motion.txt',motion_ax=motion_ax_i,camera_parameter=[640,480,320,320,320,240])
     dataloader = DataLoader(dataset, batch_size=1,shuffle=False ,num_workers=1,drop_last=True)
-    for i_batch, sample_batched in enumerate(dataloader):
-        #print(i_batch, sample_batched['image_f_01'])
-        print(i_batch, sample_batched['motion_f_01'])
     for i_item in range(len(dataset)):
         img_1,img_2,depth,motion = dataset.show_item(i_item)
         print(motion)
-        name_pre = 'saved_img/x_trans'+str(motion[0])
+        name_pre = 'result/saved_img/'+args.tag+str(np.sum(motion))
         cv2.imwrite(name_pre+'img_1.png',255*img_1)
         cv2.imwrite(name_pre+'img_2.png',255*img_2)
         cv2.imwrite(name_pre+'depth_1.png',255*depth/100)

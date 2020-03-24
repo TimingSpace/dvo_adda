@@ -7,7 +7,7 @@ from utils.inverse_warp import inverse_warp
 
 
 class RandomDataset(Dataset):
-    def __init__(self,data_length=1000, transform_=None,camera_parameter=[64,48,32,32,32,24],motion_ax=[1,1,1,1,1,1]):
+    def __init__(self,data_length=1000, transform_=None,camera_parameter=[640,480,320,320,320,240],motion_ax=[1,1,1,1,1,1]):
         print(motion_ax)
         self.data_length = data_length
         self.camera_parameter = camera_parameter
