@@ -106,6 +106,8 @@ def adapt(src_encoder, tgt_encoder, critic,
                               loss_tgt.data.item(),
                               acc.data.item()))
 
+    return tgt_encoder,critic
+
         #############################
         # 2.4 save model parameters #
         #############################

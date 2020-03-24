@@ -41,8 +41,8 @@ def test_adapt():
     tgt_extractor.load_state_dict(torch.load(args.feature_model))
     dvo_discriminator     = Discriminator(500,500,2)
     adapt(src_extractor,tgt_extractor,dvo_discriminator,dataloader,dataloader_tgt,args)
-    
-
+    torch.save(tgt_extractor.state_dict(),'tgt_feature_'+args.tag+str(args.epoch)+'.pt')
+    torch.save(dvo_discriminator.state_dict(),'dis_'+args.tag+str(args.epoch)+'.pt')
 
 def test_train():
     args = parse()
@@ -56,6 +56,19 @@ def test_train():
     trained_feature,trained_regressor = train(dvo_feature_extractor,dvo_regressor,dataloader,args)
     torch.save(trained_feature.state_dict(),'feature_seed'+args.motion_ax.replace(' ','')+str(args.epoch)+'.pt')
     torch.save(trained_regressor.state_dict(),'regressor_seed'+args.motion_ax.replace(' ','')+str(args.epoch)+'.pt')
+
+def test_test_real():
+    args = parse()
+    print(args)
+    dataset = SepeDataset(args.poses_train,args.images_train,coor_layer_flag =False)
+    dataloader = DataLoader(dataset, batch_size=10,shuffle=False ,num_workers=1,drop_last=True)
+    dvo_feature_extractor = DVOFeature()
+    dvo_regressor         = DVORegression()
+    dvo_discriminator     = Discriminator(500,500,2)
+    dvo_feature_extractor.load_state_dict(torch.load(('feature_ntsd_2_10.pt')))
+    dvo_regressor.load_state_dict(torch.load('regressor_seed_ntsd_2_10.pt'))
+    test(dvo_feature_extractor,dvo_regressor,dataloader,args)
+
 
 def test_test():
     args = parse()
@@ -122,7 +135,8 @@ def main():
     #test_test()
     #test_sep_data()
     #test_train_real()
-    test_adapt()
+    #test_adapt()
+    test_test_real()
 
 
 if __name__ == '__main__':

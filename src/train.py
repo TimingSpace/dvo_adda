@@ -47,20 +47,16 @@ def train(feature_extractor,regressor,dataloader,args=None):
 def test(feature_extractor,regressor,dataloader,args=None):
     loss_func = nn.MSELoss()
     test_log = open('test_log_'+args.motion_ax.replace(' ','')+'.txt','w')
-    for epoch in range(args.epoch):
-        loss_sum = 0
-        for step, samples in enumerate(dataloader):
-            images = samples['image_f_01']
-            motions = samples['motion_f_01']
-            print(motions)
-            feature = feature_extractor(images)
-            motions_pred  = regressor(feature)
-            loss = loss_func(motions_pred, motions)
-            loss_sum += loss.item() 
-        loss_sum = loss_sum/(len(dataloader)//dataloader.batch_size)
-        print('test epoch  ',epoch,' loss ' ,loss_sum)
-        test_log.write(str(epoch)+' '+str(loss_sum)+'\n')
-        if epoch%10==1:
-            test_log.flush()
+    loss_sum = 0
+    for step, samples in enumerate(dataloader):
+        images = samples['image_f_01']
+        motions = samples['motion_f_01']
+        feature = feature_extractor(images)
+        motions_pred  = regressor(feature)
+        loss = loss_func(motions_pred, motions)
+        print(loss.item())
+        loss_sum += loss.item() 
+    loss_sum = loss_sum/(len(dataloader))
+    print( 'loss ' ,loss_sum)
 
 

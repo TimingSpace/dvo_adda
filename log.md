@@ -46,3 +46,7 @@ differient code )
 # 20200322
 1. never use -1 when reshape
 2. add train on real image
+3. add adaption
+
+# 20200322
+1. test 0.0566  0.5807 adapt 0.4189 0.8468
