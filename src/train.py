@@ -7,7 +7,7 @@ from torch.utils.data import Dataset, DataLoader
 
 
 
-def train(feature_extractor,regressor,dataloader,args=None):
+def train(feature_extractor,regressor,dataloader,train_ax=[0,1,2,3,4,5],args=None):
     feature_extractor.train()
     regressor.train()
     if args.gpu:
@@ -20,6 +20,7 @@ def train(feature_extractor,regressor,dataloader,args=None):
                 lr=0.001)
     loss_func = nn.MSELoss()
     train_log = open('train_log_'+args.tag+'.txt','w')
+    train_ax = torch.LongTensor(train_ax)
     for epoch in range(args.epoch):
         loss_sum = 0
         for step, samples in enumerate(dataloader):
@@ -31,7 +32,7 @@ def train(feature_extractor,regressor,dataloader,args=None):
                 motions = motions.cuda()
             feature = feature_extractor(images)
             motions_pred  = regressor(feature)
-            loss = loss_func(motions_pred, motions)
+            loss = loss_func(motions_pred[:,train_ax], motions[:,train_ax])
             print(epoch,'  ',step,'    ',loss.data)
             loss_sum += loss.item() 
             # optimize source classifier
@@ -44,16 +45,18 @@ def train(feature_extractor,regressor,dataloader,args=None):
             train_log.flush()
     return feature_extractor,regressor
 
-def test(feature_extractor,regressor,dataloader,args=None):
+def test(feature_extractor,regressor,dataloader,test_ax=[0,1,2,3,4,5],args=None):
     loss_func = nn.MSELoss()
-    test_log = open('test_log_'+args.motion_ax.replace(' ','')+'.txt','w')
+    test_ax = torch.LongTensor(test_ax)
     loss_sum = 0
     for step, samples in enumerate(dataloader):
         images = samples['image_f_01']
         motions = samples['motion_f_01']
         feature = feature_extractor(images)
         motions_pred  = regressor(feature)
-        loss = loss_func(motions_pred, motions)
+        print(motions_pred)
+        print(motions)
+        loss = loss_func(motions_pred[:,test_ax], motions[:,test_ax])
         print(loss.item())
         loss_sum += loss.item() 
     loss_sum = loss_sum/(len(dataloader))

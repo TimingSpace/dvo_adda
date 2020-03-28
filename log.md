@@ -48,5 +48,10 @@ differient code )
 2. add train on real image
 3. add adaption
 
-# 20200322
+# 20200323
 1. test 0.0566  0.5807 adapt 0.4189 0.8468
+
+
+# 20200325
+1. todo modify eular to so3
+2. adapt

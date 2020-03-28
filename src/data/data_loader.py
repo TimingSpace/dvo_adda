@@ -27,7 +27,7 @@ class SepeDataset(Dataset):
     pose file is necessary, the paths of list files and motion files should be in two txt
     files:
     """
-    def __init__(self, path_to_poses_files, path_to_image_lists, transform_=None,camera_parameter=[640,180,640,640,320,90],norm_flag=0,coor_layer_flag=True):
+    def __init__(self, path_to_poses_files, path_to_image_lists, transform_=None,camera_parameter=[640,180,320,320,320,90],norm_flag=0,coor_layer_flag=True):
         """
         Args:
             motions_file (string): Path to the pose file with camera pose.
@@ -64,7 +64,7 @@ class SepeDataset(Dataset):
         self.transform = None
 
         transform_ = [
-                transforms.Resize((480,640)),
+                transforms.Resize((camera_parameter[1],camera_parameter[0])),
                 transforms.ToTensor(),
                 transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5)) ]
 
@@ -156,7 +156,7 @@ class SepeDataset(Dataset):
                     motion_10_row_6 = (motion_10_row_6-motion_means_tensor)/motion_stds_tensor
                     motion_21_row_6 = (motion_21_row_6-motion_means_tensor)/motion_stds_tensor
                     motion_20_row_6 = (motion_20_row_6-motion_means_tensor)/motion_stds_tensor
-                else:
+                elif False:
                     motion_01_row_6 = (motion_01_row_6)/motion_stds_tensor
                     motion_12_row_6 = (motion_12_row_6)/motion_stds_tensor
                     motion_02_row_6 = (motion_02_row_6)/motion_stds_tensor

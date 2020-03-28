@@ -14,6 +14,11 @@ class RandomDataset(Dataset):
         self.camera_intrinsic =torch.Tensor([self.camera_parameter[2],0,self.camera_parameter[4],0,self.camera_parameter[3],self.camera_parameter[5],0,0,1]).view(3,3)
         self.inverse_camera_intrinsic = self.camera_intrinsic.inverse()
         self.motion_ax = np.array(motion_ax)
+        self.motion_ax_normalize = self.motion_ax.copy() 
+        for i in range(len(self.motion_ax)):
+            if self.motion_ax_normalize[i]!=0:
+                self.motion_ax_normalize[i]=1/self.motion_ax_normalize[i]
+        self.motion_ax_normalize = torch.Tensor(self.motion_ax_normalize)
 
     def __len__(self):
         return self.data_length
@@ -24,7 +29,8 @@ class RandomDataset(Dataset):
         motion_se = torch.Tensor((2*np.random.random((6))-1)*self.motion_ax)#motion
         image_1= self.warp(image_0,depth_0,motion_se)
         image_f_01 = torch.Tensor( np.concatenate((image_0,image_1),axis=0))
-        sample = {'image_f_01':image_f_01,'motion_f_01':motion_se}
+
+        sample = {'image_f_01':image_f_01,'motion_f_01':motion_se*self.motion_ax_normalize}
         return sample
     def show_item(self):
         image_0 = np.random.random((3,self.camera_parameter[1],self.camera_parameter[0]))#image_0

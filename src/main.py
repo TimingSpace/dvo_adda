@@ -46,45 +46,46 @@ def adapt():
 def train_random():
     args = parse()
     print(args)
-    motion_ax_i = [int(i) for i in args.motion_ax.split(' ')]
-    dataset = RandomDataset(20000,motion_ax = motion_ax_i)
-    dataloader = DataLoader(dataset, batch_size=1000,shuffle=False ,num_workers=1,drop_last=True,worker_init_fn=lambda wid:np.random.seed(np.uint32(torch.initial_seed() + wid)))
+    motion_ax_i = [float(i) for i in args.motion_ax.split(' ')]
+    dataset = RandomDataset(200,motion_ax = motion_ax_i)
+    dataloader = DataLoader(dataset, batch_size=10,shuffle=False ,num_workers=1,drop_last=True,worker_init_fn=lambda wid:np.random.seed(np.uint32(torch.initial_seed() + wid)))
     dvo_feature_extractor = DVOFeature()
     dvo_regressor         = DVORegression()
     dvo_discriminator     = Discriminator(500,500,2)
-    trained_feature,trained_regressor = train(dvo_feature_extractor,dvo_regressor,dataloader,args)
-    torch.save(trained_feature.state_dict(),'feature_seed'+args.motion_ax.replace(' ','')+str(args.epoch)+'.pt')
-    torch.save(trained_regressor.state_dict(),'regressor_seed'+args.motion_ax.replace(' ','')+str(args.epoch)+'.pt')
+    trained_feature,trained_regressor = train(dvo_feature_extractor,dvo_regressor,dataloader,[2,4],args)
+    torch.save(trained_feature.state_dict(),'feature_seed'+args.tag+args.motion_ax.replace(' ','')+str(args.epoch)+'.pt')
+    torch.save(trained_regressor.state_dict(),'regressor_seed'+args.tag+args.motion_ax.replace(' ','')+str(args.epoch)+'.pt')
 
 def test_real():
     args = parse()
     print(args)
     dataset = SepeDataset(args.poses_train,args.images_train,coor_layer_flag =False)
-    dataloader = DataLoader(dataset, batch_size=10,shuffle=False ,num_workers=1,drop_last=True)
+    dataloader = DataLoader(dataset, batch_size=1,shuffle=False ,num_workers=1,drop_last=True)
     dvo_feature_extractor = DVOFeature()
     dvo_regressor         = DVORegression()
-    dvo_discriminator     = Discriminator(500,500,2)
-    dvo_feature_extractor.load_state_dict(torch.load(('feature_ntsd_2_10.pt')))
-    dvo_regressor.load_state_dict(torch.load('regressor_seed_ntsd_2_10.pt'))
+    dvo_feature_extractor.load_state_dict(torch.load(('feature'+args.tag+'.pt')))
+    dvo_regressor.load_state_dict(torch.load('regressor'+args.tag+'.pt'))
     test(dvo_feature_extractor,dvo_regressor,dataloader,args)
 
 
 def test_random():
     args = parse()
     print(args)
-    motion_ax_i = [int(i) for i in args.motion_ax.split(' ')]
-    test_motion_ax_i = [int(i) for i in args.test_motion_ax.split(' ')]
-    dataset = RandomDataset(2,motion_ax = test_motion_ax_i)
+    motion_ax_i = [float(i) for i in args.motion_ax.split(' ')]
+    test_motion_ax_i = [float(i) for i in args.test_motion_ax.split(' ')]
+    dataset = RandomDataset(100,motion_ax = test_motion_ax_i)
     dataloader = DataLoader(dataset, batch_size=1,shuffle=False ,num_workers=1,drop_last=True)
     dvo_feature_extractor = DVOFeature()
     dvo_regressor         = DVORegression()
     dvo_discriminator     = Discriminator(500,500,2)
-    dvo_feature_extractor.load_state_dict(torch.load('feature'+args.motion_ax.replace(' ','')+'.pt'))
-    dvo_regressor.load_state_dict(torch.load('regressor'+args.motion_ax.replace(' ','')+'.pt'))
-    test(dvo_feature_extractor,dvo_regressor,dataloader,args)
+    dvo_feature_extractor.load_state_dict(torch.load('feature_seed'+args.tag+args.motion_ax.replace(' ','')+str(args.epoch)+'.pt'))
+    dvo_regressor.load_state_dict(torch.load('regressor_seed'+args.tag+args.motion_ax.replace(' ','')+str(args.epoch)+'.pt'))
+    test(dvo_feature_extractor,dvo_regressor,dataloader,[0,1,2],args)
     
 def main():
     train_random()
+    #test_random()
+    #test_real()
 
 if __name__ == '__main__':
     main()

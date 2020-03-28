@@ -2,6 +2,7 @@
 from __future__ import division
 import torch
 import torch.nn.functional as F
+from scipy.spatial.transform import Rotation as R
 
 pixel_coords = None
 
@@ -70,6 +71,17 @@ def cam2pixel(cam_coords, proj_c2p_rot, proj_c2p_tr, padding_mode):
     pixel_coords = torch.stack([X_norm, Y_norm], dim=2)  # [B, H*W, 2]
     return pixel_coords.reshape(b,h,w,2)
 
+def so2mat(angle):
+    """Convert so3 angles to rotation matrix.
+     Reference: https://github.com/pulkitag/pycaffe-utils/blob/master/rot_utils.py#L174
+
+    Args:
+        angle: rotation angle along 3 axis  -- size = [B, 3]
+    Returns:
+        Rotation matrix corresponding to the so3 angles -- size = [B, 3, 3]
+    """
+    return torch.Tensor(R.from_rotvec(angle).as_dcm())
+
 
 def euler2mat(angle):
     """Convert euler angles to rotation matrix.
@@ -135,7 +147,7 @@ def quat2mat(quat):
     return rotMat
 
 
-def pose_vec2mat(vec, rotation_mode='euler'):
+def pose_vec2mat(vec, rotation_mode='so3'):
     """
     Convert 6DoF parameters to transformation matrix.
 
@@ -150,6 +162,8 @@ def pose_vec2mat(vec, rotation_mode='euler'):
         rot_mat = euler2mat(rot)  # [B, 3, 3]
     elif rotation_mode == 'quat':
         rot_mat = quat2mat(rot)  # [B, 3, 3]
+    elif rotation_mode == 'so3':
+        rot_mat = so2mat(rot)
     transform_mat = torch.cat([rot_mat, translation], dim=2)  # [B, 3, 4]
     return transform_mat
 
