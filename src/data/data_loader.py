@@ -27,7 +27,8 @@ class SepeDataset(Dataset):
     pose file is necessary, the paths of list files and motion files should be in two txt
     files:
     """
-    def __init__(self, path_to_poses_files, path_to_image_lists, transform_=None,camera_parameter=[640,180,320,320,320,90],norm_flag=0,coor_layer_flag=True):
+    def __init__(self, path_to_poses_files, path_to_image_lists,
+    transform_=None,camera_parameter=[640,480,320,320,320,240],norm_flag=0,coor_layer_flag=True):
         """
         Args:
             motions_file (string): Path to the pose file with camera pose.

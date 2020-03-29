@@ -65,7 +65,7 @@ def load_image(image_path):
 
 class RandomDatasetAdv(Dataset):
     def __init__(self,data_length=1000,
-    transform_=None,camera_parameter=[64,48,32,32,32,24],motion_path=None,image_path=None,motion_ax=[1,1,1,1,1,1]):
+    transform_=None,camera_parameter=[640,480,320,320,320,240],motion_path=None,image_path=None,motion_ax=[1,1,1,1,1,1]):
         print(motion_ax)
         self.data_length = data_length
         self.camera_parameter = camera_parameter
@@ -80,6 +80,11 @@ class RandomDatasetAdv(Dataset):
         if image_path is not None:
             self.image = load_image(image_path)
 
+        self.motion_ax_normalize = self.motion_ax.copy() 
+        for i in range(len(self.motion_ax)):
+            if self.motion_ax_normalize[i]!=0:
+                self.motion_ax_normalize[i]=1/self.motion_ax_normalize[i]
+        self.motion_ax_normalize = torch.Tensor(self.motion_ax_normalize)
     def __len__(self):
         return self.data_length
 
@@ -95,7 +100,7 @@ class RandomDatasetAdv(Dataset):
 
         image_1= self.warp(image_0,depth_0,motion_se)
         image_f_01 = torch.Tensor( np.concatenate((image_0,image_1),axis=0))
-        sample = {'image_f_01':image_f_01,'motion_f_01':motion_se}
+        sample = {'image_f_01':image_f_01,'motion_f_01':motion_se*self.motion_ax_normalize}
         return sample
     def show_item(self,idx):
         image_0 = np.random.random((3,self.camera_parameter[1],self.camera_parameter[0]))#image_0

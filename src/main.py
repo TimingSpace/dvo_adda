@@ -5,6 +5,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 
 from data.random_data_loader import RandomDataset 
+from data.random_data_loader import RandomDatasetAdv
 from data.data_loader import SepeDataset
 from models.VONet import DVOFeature,DVORegression
 from models.discriminator import Discriminator
@@ -19,12 +20,12 @@ def train_real():
     args = parse()
     print(args)
     dataset = SepeDataset(args.poses_train,args.images_train,coor_layer_flag =False)
-    dataloader = DataLoader(dataset, batch_size=3,shuffle=True ,num_workers=1,drop_last=True,worker_init_fn=lambda wid:np.random.seed(np.uint32(torch.initial_seed() + wid)))
+    dataloader = DataLoader(dataset, batch_size=10,shuffle=True ,num_workers=1,drop_last=True,worker_init_fn=lambda wid:np.random.seed(np.uint32(torch.initial_seed() + wid)))
     dvo_feature_extractor = DVOFeature()
     dvo_regressor         = DVORegression()
-    trained_feature,trained_regressor = train(dvo_feature_extractor,dvo_regressor,dataloader,args)
-    torch.save(trained_feature.state_dict(),'feature_'+args.tag+str(args.epoch)+'.pt')
-    torch.save(trained_regressor.state_dict(),'regressor_'+args.tag+str(args.epoch)+'.pt')
+    trained_feature,trained_regressor = train(dvo_feature_extractor,dvo_regressor,dataloader,[2,4],args)
+    torch.save(trained_feature.state_dict(),'feature_seed'+args.tag+str(args.epoch)+'.pt')
+    torch.save(trained_regressor.state_dict(),'regressor_seed'+args.tag+str(args.epoch)+'.pt')
 
 
 def adapt():
@@ -47,14 +48,14 @@ def train_random():
     args = parse()
     print(args)
     motion_ax_i = [float(i) for i in args.motion_ax.split(' ')]
-    dataset = RandomDataset(200,motion_ax = motion_ax_i)
+    dataset = RandomDatasetAdv(1000,image_path = None,motion_ax = motion_ax_i)
     dataloader = DataLoader(dataset, batch_size=10,shuffle=False ,num_workers=1,drop_last=True,worker_init_fn=lambda wid:np.random.seed(np.uint32(torch.initial_seed() + wid)))
     dvo_feature_extractor = DVOFeature()
     dvo_regressor         = DVORegression()
     dvo_discriminator     = Discriminator(500,500,2)
     trained_feature,trained_regressor = train(dvo_feature_extractor,dvo_regressor,dataloader,[2,4],args)
-    torch.save(trained_feature.state_dict(),'feature_seed'+args.tag+args.motion_ax.replace(' ','')+str(args.epoch)+'.pt')
-    torch.save(trained_regressor.state_dict(),'regressor_seed'+args.tag+args.motion_ax.replace(' ','')+str(args.epoch)+'.pt')
+    torch.save(trained_feature.state_dict(),'result_data/feature_seed'+args.tag+args.motion_ax.replace(' ','')+str(args.epoch)+'.pt')
+    torch.save(trained_regressor.state_dict(),'result_data/regressor_seed'+args.tag+args.motion_ax.replace(' ','')+str(args.epoch)+'.pt')
 
 def test_real():
     args = parse()
@@ -63,9 +64,9 @@ def test_real():
     dataloader = DataLoader(dataset, batch_size=1,shuffle=False ,num_workers=1,drop_last=True)
     dvo_feature_extractor = DVOFeature()
     dvo_regressor         = DVORegression()
-    dvo_feature_extractor.load_state_dict(torch.load(('feature'+args.tag+'.pt')))
-    dvo_regressor.load_state_dict(torch.load('regressor'+args.tag+'.pt'))
-    test(dvo_feature_extractor,dvo_regressor,dataloader,args)
+    dvo_feature_extractor.load_state_dict(torch.load(('result_data/feature'+args.tag+'.pt')))
+    dvo_regressor.load_state_dict(torch.load('result_data/regressor'+args.tag+'.pt'))
+    test(dvo_feature_extractor,dvo_regressor,dataloader,[0,1,2,3,4,5],args)
 
 
 def test_random():
@@ -83,9 +84,16 @@ def test_random():
     test(dvo_feature_extractor,dvo_regressor,dataloader,[0,1,2],args)
     
 def main():
-    train_random()
-    #test_random()
-    #test_real()
+    args = parse()
+    if args.mode == 'train_random':
+        train_random()
+    elif args.mode =='test_random':
+        test_random()
+    elif args.mode =='train_real':
+        train_real()
+    elif args.mode == 'test_real':
+        test_real()
+
 
 if __name__ == '__main__':
     main()
